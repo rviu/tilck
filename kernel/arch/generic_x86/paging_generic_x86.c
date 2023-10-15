@@ -89,7 +89,7 @@ void init_paging(void)
       panic("Unable to allocate pageframes_refcount");
    }
 
-   pf_ref_count_inc(KERNEL_VA_TO_PA(zero_page));
+   pf_ref_count_inc(LIN_VA_TO_PA(zero_page));
 
    /* Initialize the kmalloc heap used for the "hi virtual mem" area */
    init_hi_vmem_heap();
@@ -109,7 +109,7 @@ void init_paging(void)
     */
    rc = map_page(get_kernel_pdir(),
                  user_vdso_vaddr,
-                 KERNEL_VA_TO_PA(&vdso_begin),
+                 LIN_VA_TO_PA(&vdso_begin),
                  PAGING_FL_US);
 
    if (rc < 0)

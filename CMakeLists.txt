@@ -263,6 +263,9 @@ set(KERNEL_64BIT_OFFT ON CACHE BOOL
 set(KRN_CLOCK_DRIFT_COMP ON CACHE BOOL
     "Compensate periodically for the clock drift in the system time")
 
+set(KRN32_LIN_VADDR OFF CACHE BOOL
+    "Use 896 MB of linear mapping and also map the kernel in there")
+
 # Kernel options (disabled by default)
 
 set(KRN_PAGE_FAULT_PRINTK OFF CACHE BOOL
@@ -542,9 +545,15 @@ if (${ARCH} STREQUAL "i386")
    set(ARCH_BITS        32)
 
    # Fundamental kernel MM constants
-   set(KERNEL_BASE_VA     0xC0000000)  # Better not touch!
+   set(BASE_VA            0xC0000000)  # Better not touch!
    set(KERNEL_PADDR       0x00100000)  # Better not touch!
    set(LINEAR_MAPPING_MB         896)  # Better not touch!
+   set(KERNEL_VADDR       0xC0100000)
+
+   if (NOT KRN32_LIN_VADDR)
+      set(LINEAR_MAPPING_MB      880)
+      set(KERNEL_VADDR    0xF7100000)  # 3GB + 880MB + KERNEL_PADDR
+   endif()
 
 elseif(${ARCH} STREQUAL "x86_64")
 
@@ -558,9 +567,10 @@ elseif(${ARCH} STREQUAL "x86_64")
    set(ARCH_BITS        64)
 
    # Fundamental kernel MM constants
-   set(KERNEL_BASE_VA      0x100000000000)  # +16 TB
-   set(KERNEL_PADDR            0x00100000)  # Better not touch!
-   set(LINEAR_MAPPING_MB             4096)  # Might be updated.
+   set(BASE_VA                0x100000000000)  # +16 TB
+   set(KERNEL_PADDR               0x00100000)  # Better not touch!
+   set(LINEAR_MAPPING_MB                4096)  # Might be updated.
+   set(KERNEL_VADDR       0xFFFFFFFF80000000)
 
 else()
 
